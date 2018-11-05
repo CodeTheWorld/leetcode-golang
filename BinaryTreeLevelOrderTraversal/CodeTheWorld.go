@@ -3,7 +3,9 @@ package main
 import "fmt"
 
 func main() {
-	fmt.Println("vim-go")
+	tree := &TreeNode{3, &TreeNode{9, nil, nil}, &TreeNode{20, &TreeNode{15, nil, nil}, &TreeNode{7, nil, nil}}}
+	res := levelOrder(tree)
+	fmt.Println(res)
 }
 
 type TreeNode struct {
@@ -12,19 +14,53 @@ type TreeNode struct {
 	Right *TreeNode
 }
 
+/**
+  思路：利用队列，将每层的节点塞入队列，当出队时，再分别将其左右子节点入队，由此实现层次遍历
+  时间复杂度：O(n)
+  空间复杂度：O(n)
+*/
 func levelOrder(root *TreeNode) [][]int {
-}
-
-func preOrder(root *TreeNode, depth int) {
 	res := [][]int{}
-	if nil != root {
-		if depth <= len(res) {
-			res[depth] = append(res[depth], root.Val)
-		} else {
-			res = append(res, []int{root.Val})
+	if nil == root {
+		return res
+	}
+	nodeList, length := []*TreeNode{root}, 1 // 初始化队列&队列长度
+	for 0 < length {                         // 每个循环代表一层
+		level := []int{}              // 每层的结果slice
+		for i := 0; i < length; i++ { // 遍历该层已入队的每个节点
+			level = append(level, nodeList[i].Val) // 将出队的节点加入到该层的slice中
+			if nil != nodeList[i].Left {
+				nodeList = append(nodeList, nodeList[i].Left) // 将左节点加入队列
+			}
+			if nil != nodeList[i].Right {
+				nodeList = append(nodeList, nodeList[i].Right) // 将右节点加入队列
+			}
 		}
-		leftRes := preOrder(root.Left, depth++)
-		rightRes := preOrder(root.Right, depth++)
+		nodeList = nodeList[length:] // 将遍历过的节点从队列中移除
+		length = len(nodeList)
+		res = append(res, level) // 将该层的结果加入到res中
 	}
 	return res
+}
+
+/**
+  思路：递归
+  时间复杂度：O(n)
+  空间复杂度：O(1)
+*/
+func levelOrder1(root *TreeNode) [][]int {
+	result := [][]int{}
+	return levelOrderRecursion(0, root, result)
+}
+
+func levelOrderRecursion(depth int, root *TreeNode, result [][]int) [][]int {
+	if nil == root {
+		return result
+	}
+	if depth+1 > len(result) {
+		result = append(result, []int{})
+	}
+	result[depth] = append(result[depth], root.Val)
+	result = levelOrderRecursion(depth+1, root.Left, result)
+	return levelOrderRecursion(depth+1, root.Right, result)
 }
