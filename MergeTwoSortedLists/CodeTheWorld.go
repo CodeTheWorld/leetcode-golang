@@ -4,49 +4,31 @@ import (
 	"fmt"
 )
 
+type ListNode struct {
+	Val  int
+	Next *ListNode
+}
+
 func main() {
 	l1 := &ListNode{1, nil}
-	l1.Next = &ListNode{4, nil}
-	l1.Next.Next = &ListNode{5, nil}
+	l1.Next = &ListNode{2, nil}
+	l1.Next.Next = &ListNode{4, nil}
 	l2 := &ListNode{1, nil}
 	l2.Next = &ListNode{3, nil}
 	l2.Next.Next = &ListNode{4, nil}
-	l3 := &ListNode{2, nil}
-	l3.Next = &ListNode{6, nil}
-	lists := []*ListNode{l1, l2, l3}
-	res := mergeKLists(lists)
+
+	res := mergeTwoLists(l1, l2)
 	for nil != res {
 		fmt.Println(res.Val)
 		res = res.Next
 	}
 }
 
-type ListNode struct {
-	Val  int
-	Next *ListNode
-}
-
 /**
-  思路：分支法
-  时间复杂度：O(nklogk) 最外层遍历复杂度 O(logk)；每次循环体的时间复杂度O(nk/2)(k/2次遍历2n个元素...)
+  思路：链表遍历
+  时间复杂度：O(n)
   空间复杂度：O(1)
 */
-func mergeKLists(lists []*ListNode) *ListNode {
-	count := len(lists)
-	if 0 == count {
-		return nil
-	}
-
-	for count > 1 {
-		for i := 0; i < count/2; i++ {
-			lists[i] = mergeTwoLists(lists[i], lists[count-i-1])
-		}
-		count = (count + 1) / 2
-	}
-
-	return lists[0]
-}
-
 func mergeTwoLists(l1 *ListNode, l2 *ListNode) *ListNode {
 	head := &ListNode{0, nil}
 	ptr := head
@@ -74,7 +56,4 @@ func mergeTwoLists(l1 *ListNode, l2 *ListNode) *ListNode {
 	}
 
 	return head.Next
-}
-
-func mergeKLists1(lists []*ListNode) *ListNode {
 }
