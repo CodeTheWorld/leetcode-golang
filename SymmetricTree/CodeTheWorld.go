@@ -3,13 +3,8 @@ package main
 import "fmt"
 
 func main() {
-	t1 := &TreeNode{1, nil, nil}
-	t1.Left = &TreeNode{2, nil, nil}
-	t1.Right = &TreeNode{1, nil, nil}
-	t2 := &TreeNode{1, nil, nil}
-	t2.Left = &TreeNode{2, nil, nil}
-	t2.Right = &TreeNode{1, nil, nil}
-	res := isSameTree1(t1, t2)
+	root := &TreeNode{1, &TreeNode{2, &TreeNode{3, nil, nil}, &TreeNode{4, nil, nil}}, &TreeNode{2, &TreeNode{4, nil, nil}, &TreeNode{3, nil, nil}}}
+	res := isSymmetric1(root)
 	fmt.Println(res)
 }
 
@@ -24,16 +19,23 @@ type TreeNode struct {
   时间复杂度：O(n)
   空间复杂度：O(1)
 */
-func isSameTree(p *TreeNode, q *TreeNode) bool {
-	if nil == p && nil == q {
+func isSymmetric(root *TreeNode) bool {
+	if nil == root {
 		return true
 	}
-	if nil == p || nil == q || p.Val != q.Val {
+	return isSymmetricRecursion(root.Left, root.Right)
+}
+
+func isSymmetricRecursion(left *TreeNode, right *TreeNode) bool {
+	if nil == left && nil == right {
+		return true
+	}
+	if nil == left || nil == right || left.Val != right.Val {
 		return false
 	}
-	leftRes := isSameTree(p.Left, q.Left)
-	rightRes := isSameTree(p.Right, q.Right)
-	return leftRes && rightRes
+	outterRes := isSymmetricRecursion(left.Left, right.Right)
+	innerRes := isSymmetricRecursion(left.Right, right.Left)
+	return outterRes && innerRes
 }
 
 type stack struct {
@@ -63,10 +65,14 @@ func pop(nodeStack *stack) *TreeNode {
   时间复杂度：O(n)
   空间复杂度：O(n)
 */
-func isSameTree1(p *TreeNode, q *TreeNode) bool {
+func isSymmetric1(root *TreeNode) bool {
+	if nil == root {
+		return true
+	}
 	myStack := &stack{[]*TreeNode{}, 0}
-	push(myStack, p)
-	push(myStack, q)
+	// 左右子节点都压栈
+	push(myStack, root.Left)
+	push(myStack, root.Right)
 
 	for 0 < myStack.Top {
 		left := pop(myStack)
@@ -78,9 +84,9 @@ func isSameTree1(p *TreeNode, q *TreeNode) bool {
 			return false
 		}
 		push(myStack, left.Left)
-		push(myStack, right.Left)
-		push(myStack, left.Right)
 		push(myStack, right.Right)
+		push(myStack, left.Right)
+		push(myStack, right.Left)
 	}
 	return true
 }
